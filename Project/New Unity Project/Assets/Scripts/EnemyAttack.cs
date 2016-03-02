@@ -23,11 +23,10 @@ public class EnemyAttack : MonoBehaviour {
 	}
 
 	void OnTriggerEnter(Collider other){
-		Debug.Log ("Stolknylic'");
 		if (other.gameObject == player) {
 			
 			playerInRange = true;
-			Debug.Log (playerInRange);
+
 		}
 
 	}
@@ -46,7 +45,6 @@ public class EnemyAttack : MonoBehaviour {
 	void Update(){
 
 		timer += Time.deltaTime;
-		Debug.Log (playerInRange);
 
 		if (timer >= timeBetweenAttacks && playerInRange) {
 
