@@ -54,9 +54,11 @@
      <Compile Include="Assets\JMO Assets\WarFX\Scripts\WFX_LightFlicker.cs" />
      <Compile Include="Assets\JMO Assets\WarFX\Scripts\WFX_ParticleMeshBillboard.cs" />
      <Compile Include="Assets\JMO Assets\WarFX\Spawn System\CFX_SpawnSystem.cs" />
+     <Compile Include="Assets\Scripts\EnemyAttack.cs" />
      <Compile Include="Assets\Scripts\EnemyMovement.cs" />
      <Compile Include="Assets\Scripts\FollowCamera.cs" />
      <Compile Include="Assets\Scripts\PlayerCharachter.cs" />
+     <Compile Include="Assets\Scripts\PlayerHealth.cs" />
      <None Include="Assets\JMO Assets\WarFX\Shaders\WFX_S AlphaBlend Scroll.shader" />
      <None Include="Assets\JMO Assets\WarFX\_Effects (Mobile, Reduced Overdraw)\MuzzleFlashes\!MuzzleFlash Differences.txt" />
      <None Include="Assets\JMO Assets\WarFX\Shaders\WFX_S Particle AddSoft A8.shader" />
