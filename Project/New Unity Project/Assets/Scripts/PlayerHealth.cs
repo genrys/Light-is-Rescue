@@ -11,6 +11,7 @@ public class PlayerHealth : MonoBehaviour {
 	public float flashSpeed = 5f;   
 	public Color flashColor = new Color(1f, 0f, 0f, 0.1f);  
 
+	Animator anim;
 	PlayerCharachter playerCharachter;
 	bool isDead;
 	bool damaged;
@@ -19,13 +20,13 @@ public class PlayerHealth : MonoBehaviour {
 	void Awake(){
 	
 		playerCharachter = GetComponent<PlayerCharachter> ();
-
+		anim = GetComponent <Animator> ();
 		curHealth = startHealth;
 
 	}
 
 	void Update(){
-
+		
 		if (damaged) {
 			
 			damageImage.color = flashColor;
@@ -33,7 +34,7 @@ public class PlayerHealth : MonoBehaviour {
 		}
 		else {
 
-			flashColor = Color.Lerp (damageImage.color, Color.clear, flashSpeed * Time.deltaTime);
+			damageImage.color = Color.Lerp (damageImage.color, Color.clear, flashSpeed * Time.deltaTime);
 		}
 		damaged = false;
 	}
@@ -58,6 +59,8 @@ public class PlayerHealth : MonoBehaviour {
 	void Death(){
 
 		isDead = true;
+
+		anim.SetTrigger ("Die");
 
 		playerCharachter.enabled = false;
 
