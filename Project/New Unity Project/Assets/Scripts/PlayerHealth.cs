@@ -41,11 +41,11 @@ public class PlayerHealth : MonoBehaviour {
 
 	public void TakeDamage (int amount)
 	{
-
+		Debug.Log ("IN");
 		damaged = true;
 
 		curHealth -= amount;
-
+		Debug.Log ("" + curHealth);
 		healthSlider.value = curHealth;
 
 		if (curHealth <= 0 && !isDead) {
