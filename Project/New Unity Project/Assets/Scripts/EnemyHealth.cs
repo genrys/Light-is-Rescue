@@ -11,6 +11,7 @@ public class EnemyHealth : MonoBehaviour {
 	CapsuleCollider capsuleCollider;
 	AudioSource enemyGetDamage;
 	public Transform hitParticle;
+	public Light enemyLighting;
 	Color colorEnemy;
 	Color colorBeforeСrossSZ;
 	bool isDead; 
@@ -66,12 +67,12 @@ public class EnemyHealth : MonoBehaviour {
 			firstAttack = false;
 		}
 		*/
-		if(attack)
+		if(attack && curHealth > 0)
 			enemyGetDamage.Play ();
 
-
 		curHealth -= amount;
-		Instantiate (hitParticle, transform.position, transform.rotation);
+		if(curHealth > 0)
+			Instantiate (hitParticle, transform.position, transform.rotation);
 
 		if(curHealth <= 0)
 		{
@@ -81,10 +82,13 @@ public class EnemyHealth : MonoBehaviour {
 
 	void Death ()
 	{
-
+		if(!isDead)
+			ScoreManager.Instance.score += scoreValue;
+		
 		isDead = true;
 		capsuleCollider.isTrigger = true;
 		anim.SetTrigger ("Death");
+
 
 	}
 
@@ -93,10 +97,11 @@ public class EnemyHealth : MonoBehaviour {
 
 		GetComponent <NavMeshAgent> ().enabled = false;
 		GetComponent <Rigidbody> ().isKinematic = true;
-
+		enemyLighting.enabled = false;
 		isTransparent = true;
-		ScoreManager.Instance.score += scoreValue;
 		Destroy (gameObject, 2f);
+		//if(gameObject == null)
+			
 
 	}
 }

@@ -22,11 +22,10 @@ public class Battery : MonoBehaviour {
 	}
 
 	void OnTriggerEnter(Collider other){
-	
-		if (other.gameObject == player) {
-			
-			num++;
 
+		if (other.gameObject == player) {
+			num++;
+			//Destroy (gameObject);
 		}
 	}
 
@@ -35,6 +34,5 @@ public class Battery : MonoBehaviour {
 		
 		number.text = "" + num;
 
-	}
-		
+	}		
 }
