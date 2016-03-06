@@ -6,18 +6,24 @@ public class PlayerCharachter : MonoBehaviour {
 	float speed = 6f;
 	Vector3 move;
 	Rigidbody playerRB;
+	GameObject safeZone;
+	GameObject player;
+	GameObject enemy;
 	int floorMask;
 	float camRayLength = 100f;
+	public static bool isSafeZone = false;
 
 	void Awake(){
 		floorMask = LayerMask.GetMask ("Floor");
-
 		playerRB = GetComponent <Rigidbody> ();
+		safeZone = GameObject.FindGameObjectWithTag("SafeZone");
+		player = GameObject.FindGameObjectWithTag("Player");
+		enemy = GameObject.FindGameObjectWithTag("Enemy");
 
 	}
 
 	void FixedUpdate(){
-
+		
 		float h = Input.GetAxisRaw ("Horizontal");
 		float v = Input.GetAxisRaw ("Vertical");
 
@@ -52,4 +58,23 @@ public class PlayerCharachter : MonoBehaviour {
 			
 	}
 
+	void OnTriggerEnter(Collider other){
+
+		if (other.gameObject == safeZone) {
+
+			enemy.GetComponent<NavMeshAgent> ().enabled = false;
+			isSafeZone = true;
+		}
+
+	}
+
+	void OnTriggerExit(Collider other){
+
+		if (other.gameObject == safeZone) {
+
+			enemy.GetComponent<NavMeshAgent> ().enabled = true;
+			isSafeZone = false;
+		}
+
+	}
 }

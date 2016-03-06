@@ -63,6 +63,7 @@
      <Compile Include="Assets\Scripts\FollowCamera.cs" />
      <Compile Include="Assets\Scripts\PlayerCharachter.cs" />
      <Compile Include="Assets\Scripts\PlayerHealth.cs" />
+     <Compile Include="Assets\Scripts\SafeZone.cs" />
      <Compile Include="Assets\Scripts\ScoreManager.cs" />
      <None Include="Assets\JMO Assets\WarFX\Shaders\WFX_S AlphaBlend Scroll.shader" />
      <None Include="Assets\JMO Assets\WarFX\_Effects (Mobile, Reduced Overdraw)\MuzzleFlashes\!MuzzleFlash Differences.txt" />

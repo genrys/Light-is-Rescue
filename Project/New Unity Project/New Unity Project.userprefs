@@ -1,12 +1,13 @@
 ﻿<Properties StartupItem="Assembly-CSharp.csproj">
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="Unity.Instance.Unity Editor" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\DeleteParticleSystem.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\PlayerCharachter.cs">
     <Files>
-      <File FileName="Assets\Scripts\EnemyHealth.cs" Line="6" Column="23" />
-      <File FileName="Assets\Scripts\EnemyAttack.cs" Line="54" Column="4" />
-      <File FileName="Assets\Scripts\Flashlight.cs" Line="35" Column="4" />
-      <File FileName="Assets\Scripts\PlayerHealth.cs" Line="44" Column="19" />
-      <File FileName="Assets\Scripts\DeleteParticleSystem.cs" Line="10" Column="24" />
+      <File FileName="Assets\Scripts\PlayerCharachter.cs" Line="66" Column="22" />
+      <File FileName="Assets\Scripts\EnemyMovement.cs" Line="29" Column="2" />
+      <File FileName="Assets\Scripts\EnemyHealth.cs" Line="51" Column="3" />
+      <File FileName="Assets\Scripts\PlayerHealth.cs" Line="22" Column="3" />
+      <File FileName="Assets\Scripts\EnemyAttack.cs" Line="57" Column="4" />
+      <File FileName="Assets\Scripts\ScoreManager.cs" Line="1" Column="1" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>

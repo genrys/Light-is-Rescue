@@ -9,36 +9,65 @@ public class EnemyHealth : MonoBehaviour {
 
 	Animator anim;
 	CapsuleCollider capsuleCollider;
+	AudioSource enemyGetDamage;
 	public Transform hitParticle;
-	Color _color;
+	Color colorEnemy;
+	Color colorBeforeСrossSZ;
 	bool isDead; 
 	bool isTransparent;
+	bool attack = true;
+
+
+
 
 	void Awake(){
 
 		anim = GetComponent<Animator> ();
+		enemyGetDamage = GetComponent<AudioSource> ();
 		capsuleCollider = GetComponent<CapsuleCollider> ();
 		curHealth = startHealth;
-	
+		colorBeforeСrossSZ = gameObject.GetComponent<Renderer> ().material.color;
 	}
 
 	void Update(){
 
-		/*if (isTransparent) {
+		if (PlayerHealth.enemyIdle || PlayerCharachter.isSafeZone)
+			anim.SetBool ("Idle", true);
+		else
+			anim.SetBool ("Idle", false);
 
-			_color.a = gameObject.GetComponent<Renderer>().material.color;
-			if(_color.a > 0){
-				_color.a -= 2/100;
-				gameObject.GetComponent<Renderer>().material.color = _color;
+
+		if (isTransparent || PlayerCharachter.isSafeZone) {
+			
+			colorEnemy = gameObject.GetComponent<Renderer> ().material.color;
+
+			if (colorEnemy.a > 0) {
+				
+				colorEnemy.a -= 0.05f;
+				gameObject.GetComponent<Renderer> ().material.color = colorEnemy;
 			}
-		}*/
+		} else
+			gameObject.GetComponent<Renderer> ().material.color = colorBeforeСrossSZ;
 	}
 
 	public void TakeDamage (int amount, Vector3 hitPoint)
 	{
-
-		if(isDead)
-			return;
+		/*
+		if (firstAttack) {
+			enemyGetDamage.Play ();
+			firstAttack = false;
+		} else if (!firstAttack && firstPause) {
+			enemyGetDamage.Pause();
+			firstPause = false;
+		}
+		else {
+			enemyGetDamage.UnPause();
+			firstPause = true;
+			firstAttack = false;
+		}
+		*/
+		if(attack)
+			enemyGetDamage.Play ();
 
 
 		curHealth -= amount;
@@ -55,7 +84,7 @@ public class EnemyHealth : MonoBehaviour {
 
 		isDead = true;
 		capsuleCollider.isTrigger = true;
-		anim.SetTrigger ("Dead");
+		anim.SetTrigger ("Death");
 
 	}
 

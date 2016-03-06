@@ -11,16 +11,16 @@ public class PlayerHealth : MonoBehaviour {
 	public float flashSpeed = 5f;   
 	public Color flashColor = new Color(1f, 0f, 0f, 0.1f);  
 
-	Animator anim;
+	Animator anima;
 	PlayerCharachter playerCharachter;
 	bool isDead;
 	bool damaged;
-
+	public static bool enemyIdle;
 
 	void Awake(){
 	
 		playerCharachter = GetComponent<PlayerCharachter> ();
-		anim = GetComponent <Animator> ();
+		anima = GetComponent <Animator> ();
 		curHealth = startHealth;
 
 	}
@@ -41,15 +41,15 @@ public class PlayerHealth : MonoBehaviour {
 
 	public void TakeDamage (int amount)
 	{
-		Debug.Log ("IN");
+		
 		damaged = true;
 
 		curHealth -= amount;
-		Debug.Log ("" + curHealth);
 		healthSlider.value = curHealth;
 
 		if (curHealth <= 0 && !isDead) {
 
+			enemyIdle = true;
 			Death ();
 
 		}
@@ -60,8 +60,7 @@ public class PlayerHealth : MonoBehaviour {
 
 		isDead = true;
 
-		anim.SetTrigger ("Die");
-
+		//anima.SetTrigger ("Die");
 		playerCharachter.enabled = false;
 
 	}

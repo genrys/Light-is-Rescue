@@ -12,7 +12,7 @@ public class Flashlight : MonoBehaviour {
 	AudioSource flashLightAudio;
 
 	//
-	public int damagePerShot = 5;                  
+	public int damagePerShot = 1;                  
 	public float range = 5f;                      
 	Ray shootRay;                                  
 	RaycastHit shootHit;  
@@ -74,6 +74,7 @@ public class Flashlight : MonoBehaviour {
 			EnemyHealth enemyHealth = shootHit.collider.GetComponent <EnemyHealth> ();
 			if(enemyHealth != null)
 			{
+
 				enemyHealth.TakeDamage (damagePerShot, shootHit.point);
 			}
 			gunLine.SetPosition (1, shootHit.point);

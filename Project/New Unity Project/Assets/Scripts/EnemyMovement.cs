@@ -15,18 +15,16 @@ public class EnemyMovement : MonoBehaviour {
 		playerHealth = player.GetComponent<PlayerHealth> ();
 		enemyHealth = GetComponent<EnemyHealth> ();
 		nav = GetComponent <NavMeshAgent> ();
-
 	}
 
 	void Update(){
 
-		if (enemyHealth.curHealth > 0 && playerHealth.curHealth > 0)
+		if (enemyHealth.curHealth > 0 && playerHealth.curHealth > 0 && !PlayerCharachter.isSafeZone) {
 			nav.SetDestination (player.position);
-		else
+		}
+		else {
 			nav.enabled = false;
 
-
-
-
 		}
+	}
 }
