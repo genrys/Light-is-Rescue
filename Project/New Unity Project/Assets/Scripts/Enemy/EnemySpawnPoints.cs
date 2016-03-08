@@ -23,7 +23,7 @@ public class EnemySpawnPoints : MonoBehaviour {
 
 	void Update(){
 	
-		//ActivateEnemys ();
+		ActivateEnemys ();
 
 	}
 
@@ -49,7 +49,6 @@ public class EnemySpawnPoints : MonoBehaviour {
 						
             spawnPointIndex = Random.Range (0, spawnPoints.Length);
 			enemy[i] = (GameObject)Instantiate (Resources.Load("Prefabs/Enemy"), spawnPoints [spawnPointIndex].position, spawnPoints [spawnPointIndex].rotation);
-			//enemy[i] = GameObject.FindGameObjectWithTag ("Enemy");
 			enemy[i].SetActive (false);
 			
 		}

@@ -1,22 +1,19 @@
 ﻿using UnityEngine;
-using UnityEngine.UI;
 using System.Collections;
 
 public class Battery : MonoBehaviour {
 
-	public Text number;
-	public int num;
+
 	GameObject player;
 	//Singleton pattern
 	public static Battery Instance { get; private set; }
+
 
 
 	void Awake(){
 	
 
 		player = GameObject.FindGameObjectWithTag ("Player");
-
-		num = 0;
 		//Singleton pattern
 		Instance = this;
 	}
@@ -24,15 +21,35 @@ public class Battery : MonoBehaviour {
 	void OnTriggerEnter(Collider other){
 
 		if (other.gameObject == player) {
-			num++;
-			//Destroy (gameObject);
+			BatterySpawn.Instance.num++;
 		}
 	}
 
+	void OnTriggerExit(Collider other){
 
-	void Update(){
+		if (other.gameObject == player) {
+			Deactivating ();
+		}
+	}
 		
-		number.text = "" + num;
+	void Update(){
 
-	}		
+
+	}
+
+	public void Activating(){
+
+		BatterySpawn.Instance.batSpawnPointIndex = Random.Range (0, BatterySpawn.Instance.batterySpawnPoint.Length);
+		transform.position = BatterySpawn.Instance.batterySpawnPoint [BatterySpawn.Instance.batSpawnPointIndex].position;
+
+	}
+
+	void Deactivating(){
+	
+		this.gameObject.SetActive (false);
+
+	}
+
+
+
 }

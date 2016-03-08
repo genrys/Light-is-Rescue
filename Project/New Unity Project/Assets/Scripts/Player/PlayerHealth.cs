@@ -60,12 +60,18 @@ public class PlayerHealth : MonoBehaviour {
 		playerCharachter.enabled = false;
 
 
-		while(colorPlayer.a > 0) {
-
-			colorPlayer.a -= 0.01f;
+		if(colorPlayer.a > 0) {
+			
+			colorPlayer.a -= 0.005f;
 			GetComponent<Renderer> ().material.color = colorPlayer;
 
 		} 
+		if (colorPlayer.a <= 0) {
+		
+			gameObject.SetActive (false);
+
+		}
+
 
 
 	}

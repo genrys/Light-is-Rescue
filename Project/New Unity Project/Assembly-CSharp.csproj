@@ -55,6 +55,7 @@
      <Compile Include="Assets\JMO Assets\WarFX\Scripts\WFX_ParticleMeshBillboard.cs" />
      <Compile Include="Assets\JMO Assets\WarFX\Spawn System\CFX_SpawnSystem.cs" />
      <Compile Include="Assets\Scripts\Battery.cs" />
+     <Compile Include="Assets\Scripts\BatterySpawn.cs" />
      <Compile Include="Assets\Scripts\DeleteParticleSystem.cs" />
      <Compile Include="Assets\Scripts\Enemy\EnemyAttack.cs" />
      <Compile Include="Assets\Scripts\Enemy\EnemyHealth.cs" />

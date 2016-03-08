@@ -53,11 +53,11 @@ public class Flashlight : MonoBehaviour {
 
 		}
 
-		if (Battery.Instance.num != 0 && timerFlashLight <= 0) {
+		if (BatterySpawn.Instance.num != 0 && timerFlashLight <= 0) {
 			
 			timerFlashLight = 10f;
 			flashLightPower.value = timerFlashLight;
-			Battery.Instance.num--;
+			BatterySpawn.Instance.num--;
 		}
 
 		if (flashlight.enabled) {
