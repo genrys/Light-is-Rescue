@@ -5,13 +5,9 @@ public class DeleteParticleSystem : MonoBehaviour {
 
 	private IEnumerator Start(){
 
-		yield return new WaitForSeconds(GetComponent<ParticleSystem>().duration);
-
+		yield return new WaitForSeconds(GetComponent<ParticleSystem>().duration/2f);
 		Destroy (gameObject);
 
 	}
-
-
-
 
 }

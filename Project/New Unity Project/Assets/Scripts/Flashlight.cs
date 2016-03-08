@@ -54,7 +54,7 @@ public class Flashlight : MonoBehaviour {
 		}
 
 		if (Battery.Instance.num != 0 && timerFlashLight <= 0) {
-			Debug.Log ("" + Battery.Instance.num);
+			
 			timerFlashLight = 10f;
 			flashLightPower.value = timerFlashLight;
 			Battery.Instance.num--;
