@@ -1,123 +1,133 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class EnemyHealth : MonoBehaviour {
+public class EnemyHealth : MonoBehaviour
+{
+	private Animator enemyAnimation;
+	private CapsuleCollider capsuleCollider;
+	private AudioSource enemyGetDamage;
+    private Color colorEnemy;
+    private Color colorBeforeСrossSZ;
+    private NavMeshAgent enemyNavigationAgent;
+    private Rigidbody rigidBodyKinematicComponent;
 
-	public int curHealth;
-	public int startHealth = 100;  
-	public int scoreValue = 10;
+    private bool isDeadEnemy;
+    private bool isTransparentEnemy;
+    private bool enemyUnderAttack;
+    private string deathEnemyTrigger;
+    private string idleEnemyTrigger;
 
-	Animator anim;
-	CapsuleCollider capsuleCollider;
-	AudioSource enemyGetDamage;
-	public Transform hitParticle;
+    public Transform hitParticle;
 	public Light enemyLighting;
-	Color colorEnemy;
-	Color colorBeforeСrossSZ;
-	bool isDead; 
-	bool isTransparent;
-	bool attack = true;
 
+    public int curHealthEnemy;
+    public int startHealthEnemy;
+    public int scoreValue;
 
-
-
-	void Awake(){
-
-		anim = GetComponent<Animator> ();
-		enemyGetDamage = GetComponent<AudioSource> ();
-		capsuleCollider = GetComponent<CapsuleCollider> ();
-		curHealth = startHealth;
-		colorBeforeСrossSZ = gameObject.GetComponent<Renderer> ().material.color;
+    private void Awake()
+    {
+        Initialize();
 	}
 
-	void Update(){
-
-		if (PlayerHealth.enemyIdle || PlayerCharachter.isSafeZone)
-			anim.SetBool ("Idle", true);
-		else
-			anim.SetBool ("Idle", false);
-
-
-		if (isTransparent || PlayerCharachter.isSafeZone) {
-
-			enemyLighting.enabled = false;		
-			colorEnemy = gameObject.GetComponent<Renderer> ().material.color;
-
-			if (colorEnemy.a > 0) {
-				colorEnemy.a -= 0.05f;
-				gameObject.GetComponent<Renderer> ().material.color = colorEnemy;
-			}
-			if(isDead && colorEnemy.a <= 0)
-				Deactivate ();
-		} else if(!PlayerCharachter.isSafeZone){
-			gameObject.GetComponent<Renderer> ().material.color = colorBeforeСrossSZ;
-			enemyLighting.enabled = true;	
-		}
+    private void Update()
+    {
+        EnemyState();
 	}
 
+    private void EnemyState()
+    {
+        if (PlayerHealth.enemyIdle || PlayerCharachter.Instance.isSafeZone)
+            enemyAnimation.SetBool(idleEnemyTrigger, true);
+        else
+            enemyAnimation.SetBool(idleEnemyTrigger, false);
 
-	public void Activate(){
+        if (isTransparentEnemy || PlayerCharachter.Instance.isSafeZone)
+        {
+            enemyLighting.enabled = false;
+            colorEnemy = gameObject.GetComponent<Renderer>().material.color;
 
-		EnemySpawnPoints.Instance.spawnPointIndex = Random.Range (0, EnemySpawnPoints.Instance.spawnPoints.Length);
+            if (colorEnemy.a > 0)
+            {
+                colorEnemy.a -= 0.05f;
+                gameObject.GetComponent<Renderer>().material.color = colorEnemy;
+            }
+            if (isDeadEnemy && colorEnemy.a <= 0)
+                DeactivateEnemy();
+        }
+        else if (!PlayerCharachter.Instance.isSafeZone)
+        {
+            gameObject.GetComponent<Renderer>().material.color = colorBeforeСrossSZ;
+            enemyLighting.enabled = true;
+        }
+    }
+
+	public void ActivateEnemy()
+    {
+        EnemySpawnPoints.Instance.spawnPointIndex = Random.Range (0, EnemySpawnPoints.Instance.spawnPoints.Length);
 		transform.position = EnemySpawnPoints.Instance.spawnPoints [EnemySpawnPoints.Instance.spawnPointIndex].position;
 		Awaking ();
 	}
 
-	public void Deactivate(){
-
-		this.gameObject.SetActive (false);
-
+	public void DeactivateEnemy()
+    {
+		gameObject.SetActive (false);
 	}
 
-
-	public void TakeDamage (int amount, Vector3 hitPoint)
+	public void TakeDamageByPlayer (int amount)
 	{
-
-		if(attack && curHealth > 0)
+		if(enemyUnderAttack && curHealthEnemy > 0)
 			enemyGetDamage.Play ();
 
-		curHealth -= amount;
-		if(curHealth > 0)
-			Instantiate (hitParticle, transform.position, transform.rotation);
+		curHealthEnemy -= amount;
 
-		if(curHealth <= 0)
-		{
-			Death ();
-		}
+        if (curHealthEnemy > 0)
+            Instantiate(hitParticle, transform.position, transform.rotation);
+        else
+            Death();
 	}
 
-	void Death ()
+    private void Death ()
 	{
-		if (!isDead) {
-			ScoreManager.Instance.score += scoreValue;
-		}
-		
-		isDead = true;
+		if (!isDeadEnemy)
+            DisplayTextManager.Instance.score += scoreValue;
+		isDeadEnemy = true;
 		capsuleCollider.isTrigger = true;
-		anim.SetTrigger ("Death");
-
+		enemyAnimation.SetTrigger (deathEnemyTrigger);
 	}
 
-	void Awaking(){
-		
-		curHealth = 100;
-		isDead = false;
-		isTransparent = false;
+    private void Awaking()
+    {
+		curHealthEnemy = 100;
+		isDeadEnemy = false;
+		isTransparentEnemy = false;
 		gameObject.GetComponent<Renderer> ().material.color = colorBeforeСrossSZ;
-		GetComponent <NavMeshAgent> ().enabled = true;
-		GetComponent <Rigidbody> ().isKinematic = false;
-		capsuleCollider.isTrigger = false;
-
+        //EnemyMovement.Instance.SettingsForNavigationMeshAgent(true, false);
+        enemyNavigationAgent.enabled = true;
+        rigidBodyKinematicComponent.isKinematic = false;
+        capsuleCollider.isTrigger = false;
 	}
 
 	public void StartTransparent ()
 	{
-
-		GetComponent <NavMeshAgent> ().enabled = false;
-		GetComponent <Rigidbody> ().isKinematic = true;
-		isTransparent = true;
-
-		//Destroy (gameObject, 2f);
-		//if(gameObject == null)
+        //EnemyMovement.Instance.SettingsForNavigationMeshAgent(false, true);
+        enemyNavigationAgent.enabled = false;
+        rigidBodyKinematicComponent.isKinematic = true;
+		isTransparentEnemy = true;
 	}
+
+    public void Initialize()
+    {
+        enemyAnimation = GetComponent<Animator>();
+        enemyGetDamage = GetComponent<AudioSource>();
+        capsuleCollider = GetComponent<CapsuleCollider>();
+        enemyNavigationAgent = GetComponent<NavMeshAgent>();
+        rigidBodyKinematicComponent = GetComponent<Rigidbody>();
+        colorBeforeСrossSZ = gameObject.GetComponent<Renderer>().material.color; 
+        startHealthEnemy = 100;
+        curHealthEnemy = startHealthEnemy;
+        deathEnemyTrigger = "Death";
+        idleEnemyTrigger = "Idle";
+        scoreValue = 10;
+        enemyUnderAttack = true;
+    } 
 }

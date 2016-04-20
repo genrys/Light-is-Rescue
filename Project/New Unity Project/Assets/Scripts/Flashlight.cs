@@ -2,87 +2,94 @@
 using UnityEngine.UI;
 using System.Collections;
 
-public class Flashlight : MonoBehaviour {
+public class Flashlight : MonoBehaviour
+{
+    private Ray shootRay;
+    private RaycastHit shootHit;
+    private LineRenderer gunLine;
+    private AudioSource flashLightAudio;
 
-	public Light flashlight;
+    private bool turn = false;
+    private int shootableMask;
+    private string shootLayerTag;
+
+    public Light flashlight;
+	public Light fpFlashlight;
 	public AudioClip flashTurn;
 	public Slider flashLightPower;
-	public static float timerFlashLight = 10f;
-	bool turn = false;
-	AudioSource flashLightAudio;
 
-	//
-	public int damagePerShot = 1;                  
-	public float range = 5f;                      
-	Ray shootRay;                                  
-	RaycastHit shootHit;  
-	LineRenderer gunLine;
-	int shootableMask;                              
+    public static int numOfBatterys;
+    public static float timerFlashLight;
+	public int damagePerShot;                  
+	public float range;
+    
 
-
-	void Awake(){
-		shootableMask = LayerMask.GetMask ("Shootable");
-		flashLightAudio = GetComponent <AudioSource> ();
-		gunLine = GetComponent <LineRenderer> ();
+    private void Awake()
+    {
+        Initialize();
 	}
 
-	void Update(){
-		
-		if (turn) {
-			
-			timerFlashLight -= Time.deltaTime;
-			flashLightPower.value = timerFlashLight;
-
-		}
-
-
-		if (Input.GetKeyDown (KeyCode.F) && !turn && timerFlashLight !=0) {
-
-			flashlight.enabled = true;
-			flashLightAudio.clip = flashTurn;
-			flashLightAudio.Play ();
-			turn = true;
-
-		}
-		else if(Input.GetKeyDown(KeyCode.F) && turn || timerFlashLight <= 0){
-			
-			flashlight.enabled = false;
-			flashLightAudio.clip = flashTurn;
-			flashLightAudio.Play ();
-			turn = false;
-
-		}
-
-		if (BatterySpawn.Instance.num != 0 && timerFlashLight <= 0) {
-			
-			timerFlashLight = 10f;
-			flashLightPower.value = timerFlashLight;
-			BatterySpawn.Instance.num--;
-		}
-
-		if (flashlight.enabled) {
-			Shoot ();
-		} else {
-			gunLine.enabled = false;
-		}
-
+    private void Update()
+    {
+        FlashLightAction();
 	}
 
-	void Shoot (){
+    private void FlashLightAction()
+    {
+        if (Input.GetKeyDown(KeyCode.F) && !turn && timerFlashLight != 0)
+        {
+            if (!PlayerCharachter.Instance.firstPersonCamera)
+                FlashLightTurner(true, false);
+            else
+                FlashLightTurner(false, true);
 
+            flashLightAudio.PlayOneShot(flashTurn);
+            turn = true;
+        }
+        else if (Input.GetKeyDown(KeyCode.F) && turn || timerFlashLight <= 0)
+        {
+            FlashLightTurner(false, false);
+            turn = false;
+        }
+
+        if (turn)
+        {
+            timerFlashLight -= Time.deltaTime;
+            flashLightPower.value = timerFlashLight;
+        }
+
+        if (numOfBatterys != 0 && timerFlashLight <= 0)
+        {
+            timerFlashLight = 10f;
+            flashLightPower.value = timerFlashLight;
+            numOfBatterys--;
+        }
+
+        if (flashlight.enabled)
+            Shoot();
+        else
+            gunLine.enabled = false;
+    }
+
+    private void FlashLightTurner(bool firstFL, bool secondFL)
+    {
+        flashlight.enabled = firstFL;
+        fpFlashlight.enabled = secondFL;
+    }
+
+    private void Shoot ()
+    {
 		gunLine.enabled = true;
 		gunLine.SetPosition (0, transform.position);
-
 		shootRay.origin = transform.position;
 		shootRay.direction = transform.forward;
 
 		if(Physics.Raycast (shootRay, out shootHit, range, shootableMask))
 		{
 			EnemyHealth enemyHealth = shootHit.collider.GetComponent <EnemyHealth> ();
-			if(enemyHealth != null)
+			if(enemyHealth != null && !PlayerCharachter.Instance.isSafeZone)
 			{
-
-				enemyHealth.TakeDamage (damagePerShot, shootHit.point);
+				enemyHealth.TakeDamageByPlayer (damagePerShot);
 			}
 			gunLine.SetPosition (1, shootHit.point);
 		}
@@ -90,12 +97,17 @@ public class Flashlight : MonoBehaviour {
 		{
 			gunLine.SetPosition (1, shootRay.origin + shootRay.direction * range);
 		}
-
-
 	}
 
-
-
-
-
+    private void Initialize()
+    {
+        shootLayerTag = "Shootable";
+        shootableMask = LayerMask.GetMask(shootLayerTag);
+        flashLightAudio = GetComponent<AudioSource>();
+        gunLine = GetComponent<LineRenderer>();
+        timerFlashLight = 10f;
+        damagePerShot = 10;
+        range = 5f;
+        numOfBatterys = 0;
+    }
 }

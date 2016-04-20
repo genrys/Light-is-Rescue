@@ -1,96 +1,197 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class PlayerCharachter : MonoBehaviour {
+static class objectsTags
+{
+    public static string floorTag = "Floor";
+    public static string safezoneTag = "SafeZone";
+    public static string indahouseTag = "InDaHouse";
+    public static string stepTag = "Step";
+    public static string playerRunTrigger = "Run";
+    public static string horAxisName = "Horizontal";
+    public static string vertAxisName = "Vertical";
+    public static string enemyTag = "Enemy";
+    public static string batteryTag = "Battery";
+    public static string medChestTag = "MedChest";
+}
 
-	Animator playerAnim;
-	float speed = 6f;
-	Vector3 move;
-	Rigidbody playerRB;
-	GameObject safeZone;
-	int floorMask;
-	float camRayLength = 100f;
-	public static bool isSafeZone = false;
+public class PlayerCharachter : MonoBehaviour
+{
+    public static PlayerCharachter Instance { get; private set; }
 
-	void Awake(){
-		
-		playerAnim = GetComponent<Animator> ();
-		floorMask = LayerMask.GetMask ("Floor");
-		playerRB = GetComponent <Rigidbody> ();
-		safeZone = GameObject.FindGameObjectWithTag("SafeZone");
+    private Animator playerAnim;
+    private Vector3 move;
+    private Vector3 movePlayerToMouse;
+    private Rigidbody playerRB;
+    private Ray camRayToGetMousePosition;
 
+    private GameObject safeZone;
+    private GameObject inDaHouse;
+    private GameObject step;
+    private GameObject enemyObject;
+    
+    private int floorMask;
+    private float camRayLength;
+    private float speed;
 
+    public Camera fpCamera;
+    public EnemyMovement enemyMovement;
+
+    public bool isSafeZone;
+	public bool firstPersonCamera;
+    
+    private void Awake()
+    {
+        Initialize();
 	}
 
-	void FixedUpdate(){
+    private void FixedUpdate()
+    {
+        PLayerMovementByCharachter();
+    }
 
+    private void PLayerMovementByCharachter()
+    {
+        float horizontal = Input.GetAxisRaw(objectsTags.horAxisName);
+        float v = Input.GetAxisRaw(objectsTags.vertAxisName);
+        if (!firstPersonCamera)
+        {
+            Movement(horizontal, v);
+            MoveByCursor();
+            Animating(horizontal, v);
+        }
+        else
+        {
+            fpCharacter();
+        }
+    }
 
-		float h = Input.GetAxisRaw ("Horizontal");
-		float v = Input.GetAxisRaw ("Vertical");
-
-		Movement (h,v);
-		Turning ();
-		Animating (h,v);
-	}
-
-	void Movement(float h, float v){
-
-
-		move.Set (h, 0, v);
+    private void Movement(float horCoord, float vertCoord)
+    {
+		move.Set (horCoord, 0, vertCoord);
 		move = move.normalized * speed * Time.deltaTime;
-
 		playerRB.MovePosition (transform.position + move);
 	}
 
-	void Turning(){
-	
-		Ray camRay = Camera.main.ScreenPointToRay (Input.mousePosition);
+    private void MoveByCursor()
+    {
+        GetMousePosition();
+        MoveToMousePosition(camRayToGetMousePosition);
+        RotateToMouse(movePlayerToMouse);
+    }
 
-		RaycastHit floorHit;
+    public void GetMousePosition()
+    {
+        camRayToGetMousePosition = Camera.main.ScreenPointToRay(Input.mousePosition);
+    }
 
-		if(Physics.Raycast(camRay, out floorHit, camRayLength, floorMask)){
+    private void MoveToMousePosition(Ray camRay)
+    {
+        RaycastHit floorHitToGetMousePosition;
+        if (Physics.Raycast(camRay, out floorHitToGetMousePosition, camRayLength, floorMask))
+        {
+            movePlayerToMouse = floorHitToGetMousePosition.point - transform.position;
+            movePlayerToMouse.y = 0f;
+        }
+    }
 
-			Vector3 playerToMouse = floorHit.point - transform.position;
+    private void RotateToMouse(Vector3 playerToMouse)
+    {
+        Quaternion newRotation = Quaternion.LookRotation(playerToMouse);
+        playerRB.MoveRotation(newRotation);
+    }
 
-			playerToMouse.y= 0f;
-
-			Quaternion newRotation = Quaternion.LookRotation (playerToMouse);
-
-			playerRB.MoveRotation (newRotation);
-		}
-			
+    private void OnTriggerEnter(Collider other)
+    {
+        CheckIsSafeZone(other.gameObject, false, true);
+        CheckIsHouse(other.gameObject, true);
+        CheckIsStep(other.gameObject, 0.6f, false);
 	}
 
-	void OnTriggerEnter(Collider other){
-		
-		if (other.gameObject == safeZone) {
-			for(int i = 0; i < EnemySpawnPoints.Instance.enemysToCreate; i++)
-				EnemySpawnPoints.Instance.enemy[i].GetComponent<NavMeshAgent> ().enabled = false;
-					
-			isSafeZone = true;
-		}
-
+    private void OnTriggerExit(Collider other)
+    {
+        CheckIsSafeZone(other.gameObject, true, false);
+        CheckIsHouse(other.gameObject, false);
+        CheckIsStep(other.gameObject, 0.0f, false);
 	}
+    /*
+    private void CheckPickUpObject(typeObject type)
+    {
+        switch (type)
+        {
+            case typeObject.battery:
+                break;
+            case typeObject.medChest:
+                break;
+       }
+    }
+    */
+    private void CheckIsSafeZone(GameObject other, bool isActivateNavigation, bool isSafeZoneActive)
+    {
+        if (other.gameObject == safeZone)
+        {
+            enemyMovement.NavigationActivating(isActivateNavigation);
+            isSafeZone = isSafeZoneActive;
+        }
+    }
 
-	void OnTriggerExit(Collider other){
+    private void CheckIsHouse(GameObject other, bool inTheHouse)
+    {
+        if (other.gameObject == inDaHouse)
+        {
+            fpCamera.GetComponent<Camera>().enabled = inTheHouse;
+            GetComponent<MouseLook>().enabled = inTheHouse;
+            firstPersonCamera = inTheHouse;
+            enemyMovement.NavigationActivating(!inTheHouse);
+            isSafeZone = inTheHouse;
+        }
+    }
 
-		if (other.gameObject == safeZone) {
+    private void CheckIsStep(GameObject other, float newPosition, bool isAlreadyStep)
+    {
+        if (other.gameObject == step)
+        {
+            if (!isAlreadyStep && !isSafeZone)
+            transform.position = new Vector3(transform.position.x, newPosition, transform.position.z);    
+        }
+    }
 
-			for(int i = 0; i < EnemySpawnPoints.Instance.enemysToCreate; i++)
-				EnemySpawnPoints.Instance.enemy[i].GetComponent<NavMeshAgent> ().enabled = true;
-			
-			isSafeZone = false;
-		}
-
-	}
-
-	void Animating (float h, float v)
+    private void Animating (float horizontal, float vertical)
 	{
-		
-		bool run = h != 0f || v != 0f;
-
-
-		playerAnim.SetBool ("Run", run);
+		bool run = horizontal != 0f || vertical != 0f;
+		playerAnim.SetBool (objectsTags.playerRunTrigger, run);
 	}
-//exit
+
+    private void fpCharacter()
+    {
+		transform.rotation = Quaternion.Euler (0, GetComponent<MouseLook>().curYrotation, 0);
+		if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.A))
+			playerAnim.SetBool (objectsTags.playerRunTrigger, true);
+        else
+			playerAnim.SetBool (objectsTags.playerRunTrigger, false);
+
+		if (Input.GetKey (KeyCode.W))
+			transform.position += transform.forward / 10;
+		if (Input.GetKey (KeyCode.S))
+            transform.position -= transform.forward / 10;
+		if (Input.GetKey (KeyCode.D))
+			transform.position += transform.right / 10;
+		if (Input.GetKey (KeyCode.A)) 
+			transform.position -= transform.right / 10;
+	}
+
+    private void Initialize()
+    {
+        floorMask = LayerMask.GetMask(objectsTags.floorTag);
+        safeZone = GameObject.FindGameObjectWithTag(objectsTags.safezoneTag);
+        inDaHouse = GameObject.FindGameObjectWithTag(objectsTags.indahouseTag);
+        step = GameObject.FindGameObjectWithTag(objectsTags.stepTag);
+        playerAnim = GetComponent<Animator>();
+        playerRB = GetComponent<Rigidbody>();
+        isSafeZone = false;
+        firstPersonCamera = false;
+        camRayLength = 100f;
+        speed = 6f;
+        Instance = this;
+    }
 }
